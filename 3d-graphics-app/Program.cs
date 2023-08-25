@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows.Forms;
 
 namespace _3d_graphics_app
 {
   static class Program
   {
+    private static string _modelFilesDirectory =
+      Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\")) + "/Models/ObjectFiles/";
     /// <summary>
     /// The main entry point for the application.
     /// </summary>
