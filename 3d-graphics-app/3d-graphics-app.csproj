@@ -12,6 +12,7 @@
         <FileAlignment>512</FileAlignment>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
         <Deterministic>true</Deterministic>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,6 +34,9 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+        <Reference Include="FastBitmapLib, Version=1.3.1.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>..\packages\FastBitmapLib.2.1.0\lib\net452\FastBitmapLib.dll</HintPath>
+        </Reference>
         <Reference Include="mscorlib" />
         <Reference Include="System"/>
         <Reference Include="System.Core"/>
@@ -60,10 +64,14 @@
         <Compile Include="Models\Obj.cs" />
         <Compile Include="Program.cs"/>
         <Compile Include="Properties\AssemblyInfo.cs"/>
-        <Compile Include="Render\RenderFlow.cs" />
         <Compile Include="Render\ScanLine.cs" />
+        <Compile Include="Render\Shader.cs" />
+        <Compile Include="Render\VirtualPoint.cs" />
         <Compile Include="Visuals\Camera.cs" />
         <Compile Include="Visuals\Light.cs" />
+        <EmbeddedResource Include="Form1.resx">
+          <DependentUpon>Form1.cs</DependentUpon>
+        </EmbeddedResource>
         <EmbeddedResource Include="Properties\Resources.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Resources.Designer.cs</LastGenOutput>

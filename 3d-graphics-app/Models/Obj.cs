@@ -6,19 +6,21 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using _3d_graphics_app.Render;
 
 namespace _3d_graphics_app.Models
 {
     public class Obj
     {
+        private float _moveStep = 1.0f;
         public string Name { get; set; }
-        private List<Vector4> _nodes { get; set; }
-        private List<Vector3> _normalVectors { get; set; }
-        private List<(int[], int[])> _faces { get; set; }
+        public List<VirtualPoint> VPoints { get; set; }
+        public List<Vector3> NormalVectors { get; set; }
+        public List<(int[] pointIds, int[] normalVecIds)> Faces { get; set; }
         public Matrix4x4 ModelMatrix { get; set; }
         public Color Color { get; set; }
 
-        private Func<float, Matrix4x4> _modelMatrixFunc;
+        public Func<float, Matrix4x4> ModelMatrixFunc;
 
         public Obj(string filePath, Color color, Matrix4x4 modelMatrix)
         {
@@ -32,15 +34,15 @@ namespace _3d_graphics_app.Models
         {
             Color = color;
             ModelMatrix = Matrix4x4.Identity;
-            _modelMatrixFunc = modelMatrixFunc;
+            ModelMatrixFunc = modelMatrixFunc;
             ImportObject(filePath);
         }
 
         private void ImportObject(string filePath)
         {
-            _nodes = new List<Vector4>();
-            _normalVectors = new List<Vector3>();
-            _faces = new List<(int[], int[])>();
+            VPoints = new List<VirtualPoint>();
+            NormalVectors = new List<Vector3>();
+            Faces = new List<(int[], int[])>();
 
             foreach (var line in System.IO.File.ReadLines(filePath))
             {
@@ -65,18 +67,18 @@ namespace _3d_graphics_app.Models
                         float.Parse(args[2], CultureInfo.InvariantCulture),
                         float.Parse(args[3], CultureInfo.InvariantCulture),
                         1.0f);
-                    _nodes.Add(node);
+                    VPoints.Add(new VirtualPoint(node));
                     break;
                 case "vn":
                     var normalVector = new Vector3(
                         float.Parse(args[1], CultureInfo.InvariantCulture),
                         float.Parse(args[2], CultureInfo.InvariantCulture),
                         float.Parse(args[3], CultureInfo.InvariantCulture));
-                    _normalVectors.Add(normalVector);
+                    NormalVectors.Add(normalVector);
                     break;
                 case "f":
                     // f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3
-                    var tmp = (new int[args.Length - 1], new int[args.Length - 1]); // ([v1, v2, v3], [vn1, vn2, vn3])
+                    (int[] pointIds, int[] normalVecIds) tmp = (new int[args.Length - 1], new int[args.Length - 1]); // ([v1, v2, v3], [vn1, vn2, vn3])
                     for (var i = 1; i < args.Length; i++)
                     {
                         var indices = args[i].Split('/');
@@ -84,14 +86,34 @@ namespace _3d_graphics_app.Models
                         tmp.Item2[i - 1] = int.Parse(indices[2]) - 1;
                     }
 
-                    _faces.Add(tmp);
+                    Faces.Add(tmp);
                     break;
             }
         }
 
+        public void MoveUp()
+        {
+            ModelMatrix *= Matrix4x4.CreateTranslation(0, 0, _moveStep);
+        }
+        
+        public void MoveDown()
+        {
+            ModelMatrix *= Matrix4x4.CreateTranslation(0, 0, -_moveStep);
+        }
+        
+        public void MoveLeft()
+        {
+            ModelMatrix *= Matrix4x4.CreateTranslation(0, -_moveStep, 0);
+        }
+        
+        public void MoveRight()
+        {
+            ModelMatrix *= Matrix4x4.CreateTranslation(0, _moveStep, 0);
+        }
+
         public void Update(float time)
         {
-            if (_modelMatrixFunc != null) ModelMatrix = _modelMatrixFunc(time);
+            if (ModelMatrixFunc != null) ModelMatrix = ModelMatrixFunc(time);
         }
     }
 }
